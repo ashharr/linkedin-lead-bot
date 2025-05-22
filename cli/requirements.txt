@@ -1,0 +1,2 @@
+playwright>=1.30.0  # Or a more recent stable version
+openpyxl>=3.1.0 

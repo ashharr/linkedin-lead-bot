@@ -1,0 +1,11 @@
+# Ignore all Excel files
+*.xlsx
+
+# Ignore debug output folder
+debug_output/
+
+# Ignore all SQLite database files
+*.db 
+
+# Ignore environment variable files
+.env 
