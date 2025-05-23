@@ -116,7 +116,7 @@ class DataManager:
             logger.error(f"Error inserting lead {lead_data.get('post_url')}: {e}")
             return False
 
-    def get_new_leads(self) -> list[dict]:
+    def get_new_leads(self) -> List[Dict[str, Any]]:
         """Fetches leads that have not been marked as emailed."""
         try:
             self.cursor.execute("SELECT * FROM leads WHERE is_emailed = FALSE ORDER BY scraped_at DESC")
@@ -127,7 +127,7 @@ class DataManager:
             logger.error(f"Error fetching new leads: {e}")
             return []
 
-    def mark_leads_as_emailed(self, lead_ids: list[int]):
+    def mark_leads_as_emailed(self, lead_ids: List[int]):
         if not lead_ids:
             return
         try:

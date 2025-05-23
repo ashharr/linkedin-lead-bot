@@ -1,0 +1,40 @@
+{
+  "search_url": "https://www.linkedin.com/search/results/content/?datePosted=%22past-24h%22&keywords=%22freelance%22%20AND%20(%22Backend%20Developer%22%20OR%20%22Web%20Developer%22%20OR%20%22Full%20Stack%20Developer%22)%20NOT%20%22onsite%22%20.India&origin=FACETED_SEARCH&sid=vYc",
+  "output_excel_file": "linkedin_leads_report.xlsx",
+  "database": {
+    "type": "sqlite",
+    "path": "leads.db"
+  },
+  "email_settings": {
+    "send_email": true,
+    "smtp_server": "smtp.sendgrid.net",
+    "smtp_port": 587,
+    "smtp_user": "apikey",
+    "smtp_password_env_var": "SMTP_PASSWORD",
+    "sender_email_env_var": "SENDER_EMAIL",
+    "recipient_email_env_var": "TO_EMAIL",
+    "subject_prefix": "LinkedIn Leads Report"
+  },
+  "scraper_settings": {
+    "headless": true,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36",
+    "initial_load_delay_ms": 5000,
+    "scroll_pause_time_ms": 3000,
+    "max_scrolls": 10,
+    "anti_bot_delay_min_ms": 1000,
+    "anti_bot_delay_max_ms": 3000
+  },
+  "selectors": {
+    "post_container": "div.feed-shared-update-v2",
+    "user_name": ".feed-shared-actor__name span[aria-hidden='true']",
+    "profile_url": ".feed-shared-actor__container-link",
+    "post_content": ".feed-shared-update-v2__description .feed-shared-text",
+    "posted_date": ".feed-shared-actor__sub-description .visually-hidden",
+    "post_permalink": ".feed-shared-update-v2__control-menu .feed-shared-control-menu__trigger",
+    "see_more_button": ".feed-shared-inline-show-more-text__see-more-less-toggle"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "app.log"
+  }
+} 

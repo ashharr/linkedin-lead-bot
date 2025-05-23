@@ -2,11 +2,12 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
 from datetime import datetime
 import logging
+from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
 class ExcelExporter:
-    def generate_excel(self, leads_data: list[dict], output_path: str) -> str:
+    def generate_excel(self, leads_data: List[Dict[str, Any]], output_path: str) -> str:
         """Generates an Excel file from leads data and returns the path to the file."""
         workbook = openpyxl.Workbook()
         sheet = workbook.active

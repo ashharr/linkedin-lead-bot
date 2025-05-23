@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 import html
 
 class EmailBuilder:
-    def generate_html_table(self, leads_data: list[dict]) -> str:
+    def generate_html_table(self, leads_data: List[Dict[str, Any]]) -> str:
         if not leads_data:
             return "<p>No new leads found in this report.</p>"
 
