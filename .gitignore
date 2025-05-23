@@ -9,3 +9,6 @@ debug_output/
 
 # Ignore environment variable files
 .env 
+
+# Ignote config.json
+config.json

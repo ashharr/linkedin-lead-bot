@@ -2,57 +2,95 @@ from typing import List, Dict
 import html
 
 class EmailBuilder:
-    def __init__(self):
-        pass
+    def generate_html_table(self, leads_data: list[dict]) -> str:
+        if not leads_data:
+            return "<p>No new leads found in this report.</p>"
 
-    def generate_html_table(self, leads: List[Dict]) -> str:
+        html_content = "<html><head><style>"
+        html_content += """
+            body { font-family: sans-serif; margin: 20px; }
+            h2 { color: #333; }
+            table { border-collapse: collapse; width: 100%; margin-top: 20px; font-size: 0.9em; }
+            th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+            th { background-color: #f2f2f2; color: #333; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            tr:hover { background-color: #e9e9e9; }
+            a { color: #0066cc; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            .post-content { max-width: 400px; white-space: pre-wrap; word-wrap: break-word; }
         """
-        Generates an HTML table from a list of lead dicts.
-        Returns the HTML string.
-        """
-        if not leads:
-            return "<p>No leads found.</p>"
+        html_content += "</style></head><body>"
+        html_content += "<h2>LinkedIn Leads Report</h2>"
+        html_content += "<table border='1'><thead><tr>"
+        html_content += "<th>User Name</th><th>Post Content</th><th>Posted Date</th><th>Profile URL</th><th>Post URL</th>"
+        html_content += "</tr></thead><tbody>"
 
-        columns = [
-            ("User Name", "user_name"),
-            ("Profile URL", "profile_url"),
-            ("Post Content", "post_content"),
-            ("Posted Date", "posted_timestamp"),
-            ("Post URL", "post_url"),
-            ("Scraped At", "scraped_at"),
-            ("Emailed", "is_emailed"),
-            ("Search Query", "search_query_ref")
-        ]
+        for lead in leads_data:
+            html_content += "<tr>"
+            html_content += f"<td>{html.escape(str(lead.get('user_name', 'N/A')))}</td>"
+            html_content += f"<td class='post-content'>{html.escape(str(lead.get('post_content', 'N/A')))}</td>"
+            
+            posted_timestamp_str = 'N/A'
+            posted_timestamp = lead.get('posted_timestamp')
+            if posted_timestamp:
+                # Assuming posted_timestamp is a datetime object or a string that can be directly used.
+                # If it's a datetime object, format it. If it's already a string, use it as is.
+                try:
+                    posted_timestamp_str = posted_timestamp.strftime('%Y-%m-%d %H:%M')
+                except AttributeError:
+                    posted_timestamp_str = str(posted_timestamp) # Fallback if not a datetime object
+            
+            html_content += f"<td>{html.escape(posted_timestamp_str)}</td>"
+            
+            profile_url = lead.get('profile_url', '#')
+            post_url = lead.get('post_url', '#')
+            
+            html_content += f"<td><a href='{html.escape(profile_url)}'>{html.escape(profile_url)}</a></td>"
+            html_content += f"<td><a href='{html.escape(post_url)}'>{html.escape(post_url)}</a></td>"
+            html_content += "</tr>"
+        
+        html_content += "</tbody></table></body></html>"
+        return html_content
 
-        html_table = [
-            '<table border="1" cellpadding="4" cellspacing="0" style="border-collapse:collapse;font-family:sans-serif;font-size:13px;">',
-            '<thead><tr>' + ''.join(f'<th>{html.escape(header)}</th>' for header, _ in columns) + '</tr></thead>',
-            '<tbody>'
-        ]
-
-        for lead in leads:
-            html_table.append('<tr>')
-            for _, key in columns:
-                value = lead.get(key, "")
-                if key in ("profile_url", "post_url") and value:
-                    value = f'<a href="{html.escape(str(value))}">{html.escape(str(value))}</a>'
-                else:
-                    value = html.escape(str(value))
-                html_table.append(f'<td>{value}</td>')
-            html_table.append('</tr>')
-
-        html_table.append('</tbody></table>')
-        return '\n'.join(html_table)
-
-# Example usage
-def _test():
-    from data_manager import DataManager
-    dm = DataManager()
-    leads = dm.get_new_leads()
-    builder = EmailBuilder()
-    html_str = builder.generate_html_table(leads)
-    print(html_str)
-    dm.close()
-
+# Example Usage (for testing this module directly)
 if __name__ == "__main__":
-    _test() 
+    from datetime import datetime, timedelta
+    builder = EmailBuilder()
+
+    # Test with no leads
+    print("--- Testing with no leads ---")
+    empty_html = builder.generate_html_table([])
+    print(empty_html)
+    with open("email_preview_empty.html", "w", encoding="utf-8") as f:
+        f.write(empty_html)
+    print("Saved to email_preview_empty.html\n")
+
+    # Test with sample leads
+    sample_leads = [
+        {
+            "user_name": "Alice Wonderland",
+            "post_content": "Excited to announce my new project! #innovation #tech\nIt involves a lot of interesting challenges.",
+            "posted_timestamp": datetime.now() - timedelta(days=1),
+            "profile_url": "http://linkedin.com/in/alicew",
+            "post_url": "http://linkedin.com/feed/post/alice123"
+        },
+        {
+            "user_name": "Bob The Builder",
+            "post_content": "Looking for collaborators for a construction tech solution. DM me if interested! <script>alert('xss')</script>",
+            "posted_timestamp": "2023-10-25 10:30:00", # Test with string date
+            "profile_url": "http://linkedin.com/in/bobtheb",
+            "post_url": "http://linkedin.com/feed/post/bob456"
+        },
+        {
+            "user_name": "Charles Xavier",
+            # Missing some fields to test defaults
+            "profile_url": "http://linkedin.com/in/charlesx",
+        }
+    ]
+    print("--- Testing with sample leads ---")
+    html_table = builder.generate_html_table(sample_leads)
+    print(html_table)
+    # For easier review, save to an HTML file
+    with open("email_preview_leads.html", "w", encoding="utf-8") as f:
+        f.write(html_table)
+    print("Saved to email_preview_leads.html") 
